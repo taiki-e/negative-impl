@@ -1,0 +1,112 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - staging
+  schedule:
+    - cron: '0 1 * * *'
+
+env:
+  CARGO_INCREMENTAL: 0
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+  RUST_BACKTRACE: 1
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        rust:
+          - 1.37
+          - stable
+          - beta
+          - nightly
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: taiki-e/github-actions/install-rust@main
+        with:
+          toolchain: ${{ matrix.rust }}
+      - run: cargo install cargo-hack
+        if: startsWith(matrix.rust, 'nightly')
+      - run: cargo test --all --tests
+      - run: cargo test --all
+        if: startsWith(matrix.rust, 'nightly')
+      - run: tools/check-minimal-versions.sh
+        if: startsWith(matrix.rust, 'nightly')
+
+  build:
+    strategy:
+      matrix:
+        range:
+          # This is the minimum supported Rust version of this crate.
+          # When updating this, the reminder to update the minimum supported
+          # Rust version in README.md and clippy.toml.
+          - 1.37..1.43
+          - 1.44..
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: cargo install cargo-hack
+      - run: cargo hack build --all --ignore-private --no-dev-deps --version-range ${{ matrix.range }}
+
+  clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: taiki-e/github-actions/install-rust@main
+        with:
+          component: clippy
+      - run: cargo clippy --all --all-features --all-targets
+
+  rustfmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: taiki-e/github-actions/install-rust@main
+        with:
+          component: rustfmt
+      - run: cargo fmt --all -- --check
+
+  rustdoc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: taiki-e/github-actions/install-rust@main
+      - run: cargo doc --no-deps --all --all-features
+        env:
+          RUSTDOCFLAGS: -D warnings
+
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: shellcheck **/*.sh
+
+  # This job doesn't actually test anything, but they're used to tell bors the
+  # build completed, as there is no practical way to detect when a workflow is
+  # successful listening to webhooks only.
+  #
+  # ALL THE PREVIOUS JOBS NEEDS TO BE ADDED TO THE `needs` SECTION OF THIS JOB!
+
+  ci-success:
+    name: ci
+    if: github.event_name == 'push' && success()
+    needs:
+      - test
+      - build
+      - clippy
+      - rustfmt
+      - rustdoc
+      - shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark the job as a success
+        run: exit 0

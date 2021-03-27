@@ -1,0 +1,30 @@
+[package]
+name = "negative-impl"
+version = "0.1.0"
+authors = ["Taiki Endo <te316e89@gmail.com>"]
+edition = "2018"
+license = "Apache-2.0 OR MIT"
+repository = "https://github.com/taiki-e/negative-impl"
+documentation = "https://docs.rs/negative-impl"
+keywords = ["macros"]
+categories = ["no-std", "rust-patterns"]
+exclude = ["/.*", "/tools"]
+description = """
+Negative trait implementations on stable Rust.
+"""
+
+[package.metadata.docs.rs]
+targets = ["x86_64-unknown-linux-gnu"]
+
+[workspace]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "1.0.56", features = ["full"] }
+proc-macro2 = "1"
+quote = "1"
+
+[dev-dependencies]
+static_assertions = "1"
