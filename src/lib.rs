@@ -94,6 +94,21 @@
 #[allow(unused_extern_crates)]
 extern crate proc_macro;
 
+macro_rules! format_err {
+    ($span:expr, $msg:expr) => {
+        syn::Error::new_spanned(&$span, $msg)
+    };
+    ($span:expr, $($tt:tt)*) => {
+        format_err!($span, format!($($tt)*))
+    };
+}
+
+macro_rules! bail {
+    ($($tt:tt)*) => {
+        return Err(format_err!($($tt)*))
+    };
+}
+
 use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
@@ -101,35 +116,26 @@ use syn::{
     parse_quote, token, Error, Generics, ItemImpl, Lifetime, LifetimeDef, Path, Result, Token, Type,
 };
 
-macro_rules! error {
-    ($span:expr, $msg:expr) => {
-        syn::Error::new_spanned(&$span, $msg)
-    };
-    ($span:expr, $($tt:tt)*) => {
-        error!($span, format!($($tt)*))
-    };
-}
-
 #[proc_macro_attribute]
 pub fn negative_impl(args: TokenStream, input: TokenStream) -> TokenStream {
-    parse(args.into(), syn::parse_macro_input!(input))
+    parse(&args.into(), syn::parse_macro_input!(input))
         .unwrap_or_else(Error::into_compile_error)
         .into()
 }
 
-fn parse(args: TokenStream2, mut impl_: ItemImpl) -> Result<TokenStream2> {
-    parse_as_empty(&args)?;
+fn parse(args: &TokenStream2, mut impl_: ItemImpl) -> Result<TokenStream2> {
+    parse_as_empty(args)?;
 
     let (trait_path, for_token) = match impl_.trait_.take() {
         Some((Some(_), path, for_token)) => (path, for_token),
-        Some((_, path, _)) => return Err(error!(path, "may only be used on negative trait impls")),
-        None => return Err(error!(impl_, "may only be used on negative trait impls")),
+        Some((_, path, _)) => bail!(path, "may only be used on negative trait impls"),
+        None => bail!(impl_, "may only be used on negative trait impls"),
     };
     // https://github.com/rust-lang/rust/issues/80481
     impl_.attrs.push(parse_quote!(#[doc(hidden)]));
 
     if impl_.unsafety.is_some() {
-        return Err(error!(trait_path, "negative impls cannot be unsafe"));
+        bail!(trait_path, "negative impls cannot be unsafe");
     }
 
     let trait_ = TraitInfo::new(&trait_path)?;
@@ -216,7 +222,7 @@ impl TraitInfo {
                 maybe_unsized: true,
                 full_path: parse_quote!(::std::panic::RefUnwindSafe),
             }),
-            _ => Err(error!(path, "non auto traits are not supported")),
+            _ => bail!(path, "non auto traits are not supported"),
         }
     }
 }
@@ -233,5 +239,5 @@ fn insert_lifetime(generics: &mut Generics, lifetime: Lifetime) {
 /// This is almost equivalent to `syn::parse2::<Nothing>()`, but produces
 /// a better error message and does not require ownership of `tokens`.
 fn parse_as_empty(tokens: &TokenStream2) -> Result<()> {
-    if tokens.is_empty() { Ok(()) } else { Err(error!(tokens, "unexpected token: {}", tokens)) }
+    if tokens.is_empty() { Ok(()) } else { bail!(tokens, "unexpected token: {}", tokens) }
 }
