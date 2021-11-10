@@ -167,6 +167,8 @@ fn expand(trait_: TraitInfo, mut impl_: ItemImpl) -> TokenStream2 {
             pub struct #wrapper_ident<'a, T #sized>(::core::marker::PhantomData<&'a ()>, T);
             #unsafety impl<T #sized> #full_path for #wrapper_ident<'_, T>
                 where T: #full_path {}
+            // This is false positive as we generate a trait implementation with a condition that will never be true.
+            #[allow(clippy::non_send_fields_in_send_ty)]
             #impl_
         };
     }
