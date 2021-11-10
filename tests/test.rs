@@ -31,6 +31,7 @@ pub mod basic {
     assert_not_impl!(Foo<()>: RefUnwindSafe);
 }
 
+// https://github.com/taiki-e/negative-impl#conditional-negative-impls
 pub mod conditional {
     use super::*;
 
@@ -43,13 +44,8 @@ pub mod conditional {
     #[negative_impl]
     impl<T> !Send for B<Vec<T>> where T: Copy {}
 
-    trait Trait {}
-
-    impl<T: Send> Trait for T {}
-
-    unsafe impl<T> Send for A<Result<T, T>> {}
-
-    unsafe impl<T> Send for B<Result<T, T>> {}
+    unsafe impl<T: Send> Send for A<Result<T, T>> {}
+    unsafe impl<T: Send> Send for B<Result<T, T>> {}
 
     assert_not_impl!(A<Option<()>>: Send);
     assert_impl!(A<Result<(), ()>>: Send);

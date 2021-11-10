@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Suppress `clippy::non_send_fields_in_send_ty` lint in generated code. ([#2](https://github.com/taiki-e/negative-impl/pull/2))
+
 ## [0.1.0] - 2021-03-27
 
 Initial release
