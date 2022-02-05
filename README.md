@@ -91,15 +91,6 @@ impl<T: Send> Trait for T {}
 impl Trait for Type {}
 ```
 
-### Conditional negative impls
-
-The current behavior of this crate with conditional negative impls is the
-same as the unstable `negative_impls` feature, but
-[the unstable `negative_impls` feature plans to forbid it](https://github.com/rust-lang/rust/issues/79098).
-
-It's a great plan, but when it's implemented, this crate is unlikely to
-provide the same behavior due to the macro's limitation.
-
 ## License
 
 Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or
