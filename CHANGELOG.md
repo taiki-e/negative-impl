@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Support `UnwindSafe` and `RefUnwindSafe` in no-std at Rust 1.56+. ([#3](https://github.com/taiki-e/negative-impl/pull/3))
+
 ## [0.1.1] - 2021-11-10
 
 - Suppress `clippy::non_send_fields_in_send_ty` lint in generated code. ([#2](https://github.com/taiki-e/negative-impl/pull/2))
