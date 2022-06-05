@@ -177,7 +177,7 @@ impl TraitInfo {
         match &*path.segments.last().unwrap().ident.to_string() {
             "Send" => Ok(Self {
                 // https://github.com/rust-lang/rust/blob/1.37.0/src/libcore/marker.rs#L41
-                // https://github.com/rust-lang/rust/blob/1.51.0/library/core/src/marker.rs#L43
+                // https://github.com/rust-lang/rust/blob/1.61.0/library/core/src/marker.rs#L43
                 trivial_bounds: parse_quote!(*const ()),
                 unsafety: true,
                 maybe_unsized: true,
@@ -185,7 +185,7 @@ impl TraitInfo {
             }),
             "Sync" => Ok(Self {
                 // https://github.com/rust-lang/rust/blob/1.37.0/src/libcore/marker.rs#L380
-                // https://github.com/rust-lang/rust/blob/1.51.0/library/core/src/marker.rs#L484
+                // https://github.com/rust-lang/rust/blob/1.61.0/library/core/src/marker.rs#L482
                 trivial_bounds: parse_quote!(*const ()),
                 unsafety: true,
                 maybe_unsized: true,
@@ -193,7 +193,7 @@ impl TraitInfo {
             }),
             "Unpin" => Ok(Self {
                 // https://github.com/rust-lang/rust/blob/1.37.0/src/libcore/marker.rs#L650
-                // https://github.com/rust-lang/rust/blob/1.51.0/library/core/src/marker.rs#L782
+                // https://github.com/rust-lang/rust/blob/1.61.0/library/core/src/marker.rs#L781
                 trivial_bounds: parse_quote!(::core::marker::PhantomPinned),
                 unsafety: false,
                 maybe_unsized: true,
@@ -201,7 +201,7 @@ impl TraitInfo {
             }),
             "UnwindSafe" => Ok(Self {
                 // https://github.com/rust-lang/rust/blob/1.37.0/src/libstd/panic.rs#L203
-                // https://github.com/rust-lang/rust/blob/1.51.0/library/std/src/panic.rs#L227
+                // https://github.com/rust-lang/rust/blob/1.61.0/library/core/src/panic/unwind_safe.rs#L181
                 trivial_bounds: parse_quote!(&'static mut ()),
                 unsafety: false,
                 maybe_unsized: true,
@@ -212,7 +212,7 @@ impl TraitInfo {
             }),
             "RefUnwindSafe" => Ok(Self {
                 // https://github.com/rust-lang/rust/blob/1.37.0/src/libstd/panic.rs#L234
-                // https://github.com/rust-lang/rust/blob/1.51.0/library/std/src/panic.rs#L258
+                // https://github.com/rust-lang/rust/blob/1.61.0/library/core/src/panic/unwind_safe.rs#L200
                 trivial_bounds: parse_quote!(::core::cell::UnsafeCell<()>),
                 unsafety: false,
                 maybe_unsized: true,
