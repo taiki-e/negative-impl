@@ -8,7 +8,7 @@
 
 Negative trait implementations on stable Rust.
 
-This crate emulates the [unstable `negative_impls` feature](https://doc.rust-lang.org/beta/unstable-book/language-features/negative-impls.html)
+This crate emulates the [unstable `negative_impls` feature](https://doc.rust-lang.org/nightly/unstable-book/language-features/negative-impls.html)
 by generating a trait implementation with a condition that will never be true.
 
 ## Usage
