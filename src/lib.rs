@@ -160,6 +160,7 @@ fn expand(trait_: TraitInfo, mut impl_: ItemImpl) -> TokenStream2 {
                 where T: #full_path {}
             // This is false positive as we generate a trait implementation with a condition that will never be true.
             #[allow(clippy::non_send_fields_in_send_ty)]
+            #[doc(hidden)] // Workaround https://github.com/rust-lang/rust/issues/80481
             #impl_
         };
     }
