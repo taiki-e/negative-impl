@@ -10,8 +10,6 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
-- Work around [the issue of rustdoc generating confusing documentation for negative implementations](https://github.com/rust-lang/rust/issues/80481).
-
 ## [0.1.2] - 2022-02-05
 
 - Support `UnwindSafe` and `RefUnwindSafe` in no-std at Rust 1.56+. ([#3](https://github.com/taiki-e/negative-impl/pull/3))
