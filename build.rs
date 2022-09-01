@@ -5,6 +5,8 @@
 use std::{env, process::Command, str};
 
 fn main() {
+    println!("cargo:rerun-if-changed=build.rs");
+
     let minor = match rustc_version() {
         Some(version) => version,
         None => {
@@ -13,12 +15,11 @@ fn main() {
         }
     };
 
-    // Note that this is `<` (less than), not `>=` (greater than or equal).
-    // This allows treating as the latest stable rustc is used when the build
-    // script doesn't run. This is useful for non-cargo build systems that don't
-    // run the build script.
+    // Note that this is `no_`*, not `has_*`. This allows treating as the latest
+    // stable rustc is used when the build script doesn't run. This is useful
+    // for non-cargo build systems that don't run the build script.
     if minor < 56 {
-        println!("cargo:rustc-cfg=stable_lt_1_56");
+        println!("cargo:rustc-cfg=negative_impl_no_core_unwind_safe");
     }
 }
 

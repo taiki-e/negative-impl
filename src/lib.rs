@@ -205,9 +205,9 @@ impl TraitInfo {
                 trivial_bounds: parse_quote!(&'static mut ()),
                 unsafety: false,
                 maybe_unsized: true,
-                #[cfg(not(stable_lt_1_56))]
+                #[cfg(not(negative_impl_no_core_unwind_safe))]
                 full_path: parse_quote!(::core::panic::UnwindSafe),
-                #[cfg(stable_lt_1_56)]
+                #[cfg(negative_impl_no_core_unwind_safe)]
                 full_path: parse_quote!(::std::panic::UnwindSafe),
             }),
             "RefUnwindSafe" => Ok(Self {
@@ -216,9 +216,9 @@ impl TraitInfo {
                 trivial_bounds: parse_quote!(::core::cell::UnsafeCell<()>),
                 unsafety: false,
                 maybe_unsized: true,
-                #[cfg(not(stable_lt_1_56))]
+                #[cfg(not(negative_impl_no_core_unwind_safe))]
                 full_path: parse_quote!(::core::panic::RefUnwindSafe),
-                #[cfg(stable_lt_1_56)]
+                #[cfg(negative_impl_no_core_unwind_safe)]
                 full_path: parse_quote!(::std::panic::RefUnwindSafe),
             }),
             _ => bail!(path, "non auto traits are not supported"),
