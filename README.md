@@ -4,7 +4,7 @@
 [![docs.rs](https://img.shields.io/badge/docs.rs-negative--impl-blue?style=flat-square&logo=docs.rs)](https://docs.rs/negative-impl)
 [![license](https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue?style=flat-square)](#license)
 [![rustc](https://img.shields.io/badge/rustc-1.37+-blue?style=flat-square&logo=rust)](https://www.rust-lang.org)
-[![build status](https://img.shields.io/github/workflow/status/taiki-e/negative-impl/CI/main?style=flat-square&logo=github)](https://github.com/taiki-e/negative-impl/actions)
+[![build status](https://img.shields.io/github/actions/workflow/status/taiki-e/negative-impl/ci.yml?branch=main&style=flat-square&logo=github)](https://github.com/taiki-e/negative-impl/actions)
 
 Negative trait implementations on stable Rust.
 
