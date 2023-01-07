@@ -4,18 +4,20 @@ Negative trait implementations on stable Rust.
 This crate emulates the [unstable `negative_impls` feature](https://doc.rust-lang.org/nightly/unstable-book/language-features/negative-impls.html)
 by generating a trait implementation with a condition that will never be true.
 
-# Examples
+## Examples
 
 ```rust
-# use negative_impl::negative_impl;
-# pub struct Type {}
+use negative_impl::negative_impl;
+
+pub struct Type {}
+
 #[negative_impl]
 impl !Send for Type {}
 #[negative_impl]
 impl !Sync for Type {}
 ```
 
-# Supported traits
+## Supported traits
 
 Currently this crate only supports [auto traits](https://doc.rust-lang.org/reference/special-types-and-traits.html#auto-traits).
 
@@ -25,9 +27,9 @@ Currently this crate only supports [auto traits](https://doc.rust-lang.org/refer
 - [`UnwindSafe`](https://doc.rust-lang.org/std/panic/trait.UnwindSafe.html)
 - [`RefUnwindSafe`](https://doc.rust-lang.org/std/panic/trait.RefUnwindSafe.html)
 
-# Limitations
+## Limitations
 
-## Conflicting implementations
+### Conflicting implementations
 
 The following code cannot compile due to `impl<T: Send> Trait for T` and
 `impl Trait for Type` conflict.
@@ -58,7 +60,7 @@ error[E0119]: conflicting implementations of trait `Trait` for type `Type`:
 
 The above code can be compiled using the unstable `negative_impls` feature.
 
-```
+```rust
 #![feature(negative_impls)]
 
 pub struct Type {}
