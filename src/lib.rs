@@ -1,74 +1,76 @@
-//! Negative trait implementations on stable Rust.
-//!
-//! This crate emulates the [unstable `negative_impls` feature](https://doc.rust-lang.org/nightly/unstable-book/language-features/negative-impls.html)
-//! by generating a trait implementation with a condition that will never be true.
-//!
-//! # Examples
-//!
-//! ```rust
-//! # use negative_impl::negative_impl;
-//! # pub struct Type {}
-//! #[negative_impl]
-//! impl !Send for Type {}
-//! #[negative_impl]
-//! impl !Sync for Type {}
-//! ```
-//!
-//! # Supported traits
-//!
-//! Currently this crate only supports [auto traits](https://doc.rust-lang.org/reference/special-types-and-traits.html#auto-traits).
-//!
-//! - [`Send`](https://doc.rust-lang.org/std/marker/trait.Send.html)
-//! - [`Sync`](https://doc.rust-lang.org/std/marker/trait.Sync.html)
-//! - [`Unpin`](https://doc.rust-lang.org/std/marker/trait.Unpin.html)
-//! - [`UnwindSafe`](https://doc.rust-lang.org/std/panic/trait.UnwindSafe.html)
-//! - [`RefUnwindSafe`](https://doc.rust-lang.org/std/panic/trait.RefUnwindSafe.html)
-//!
-//! # Limitations
-//!
-//! ## Conflicting implementations
-//!
-//! The following code cannot compile due to `impl<T: Send> Trait for T` and
-//! `impl Trait for Type` conflict.
-//!
-//! ```rust,compile_fail,E0119
-//! use negative_impl::negative_impl;
-//!
-//! pub struct Type {}
-//!
-//! #[negative_impl]
-//! impl !Send for Type {}
-//!
-//! trait Trait {}
-//!
-//! impl<T: Send> Trait for T {}
-//! impl Trait for Type {}
-//! ```
-//!
-//! ```text
-//! error[E0119]: conflicting implementations of trait `Trait` for type `Type`:
-//!   --> src/lib.rs:60:1
-//!    |
-//! 14 | impl<T: Send> Trait for T {}
-//!    | ------------------------- first implementation here
-//! 15 | impl Trait for Type {}
-//!    | ^^^^^^^^^^^^^^^^^^^ conflicting implementation for `Type`
-//! ```
-//!
-//! The above code can be compiled using the unstable `negative_impls` feature.
-//!
-//! ```
-//! #![feature(negative_impls)]
-//!
-//! pub struct Type {}
-//!
-//! impl !Send for Type {}
-//!
-//! trait Trait {}
-//!
-//! impl<T: Send> Trait for T {}
-//! impl Trait for Type {}
-//! ```
+/*!
+Negative trait implementations on stable Rust.
+
+This crate emulates the [unstable `negative_impls` feature](https://doc.rust-lang.org/nightly/unstable-book/language-features/negative-impls.html)
+by generating a trait implementation with a condition that will never be true.
+
+# Examples
+
+```rust
+# use negative_impl::negative_impl;
+# pub struct Type {}
+#[negative_impl]
+impl !Send for Type {}
+#[negative_impl]
+impl !Sync for Type {}
+```
+
+# Supported traits
+
+Currently this crate only supports [auto traits](https://doc.rust-lang.org/reference/special-types-and-traits.html#auto-traits).
+
+- [`Send`](https://doc.rust-lang.org/std/marker/trait.Send.html)
+- [`Sync`](https://doc.rust-lang.org/std/marker/trait.Sync.html)
+- [`Unpin`](https://doc.rust-lang.org/std/marker/trait.Unpin.html)
+- [`UnwindSafe`](https://doc.rust-lang.org/std/panic/trait.UnwindSafe.html)
+- [`RefUnwindSafe`](https://doc.rust-lang.org/std/panic/trait.RefUnwindSafe.html)
+
+# Limitations
+
+## Conflicting implementations
+
+The following code cannot compile due to `impl<T: Send> Trait for T` and
+`impl Trait for Type` conflict.
+
+```rust,compile_fail,E0119
+use negative_impl::negative_impl;
+
+pub struct Type {}
+
+#[negative_impl]
+impl !Send for Type {}
+
+trait Trait {}
+
+impl<T: Send> Trait for T {}
+impl Trait for Type {}
+```
+
+```text
+error[E0119]: conflicting implementations of trait `Trait` for type `Type`:
+  --> src/lib.rs:60:1
+   |
+14 | impl<T: Send> Trait for T {}
+   | ------------------------- first implementation here
+15 | impl Trait for Type {}
+   | ^^^^^^^^^^^^^^^^^^^ conflicting implementation for `Type`
+```
+
+The above code can be compiled using the unstable `negative_impls` feature.
+
+```
+#![feature(negative_impls)]
+
+pub struct Type {}
+
+impl !Send for Type {}
+
+trait Trait {}
+
+impl<T: Send> Trait for T {}
+impl Trait for Type {}
+```
+*/
 
 #![doc(test(
     no_crate_inject,
