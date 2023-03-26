@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+## [0.1.3] - 2023-03-26
+
 - Update `syn` dependency to 2. This increase the minimum supported Rust version from Rust 1.37 to Rust 1.56.
 
 ## [0.1.2] - 2022-02-05
@@ -24,7 +26,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 Initial release
 
-[Unreleased]: https://github.com/taiki-e/negative-impl/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/taiki-e/negative-impl/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/taiki-e/negative-impl/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/taiki-e/derive_utils/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/taiki-e/derive_utils/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/taiki-e/negative-impl/releases/tag/v0.1.0
