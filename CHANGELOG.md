@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Update `syn` dependency to 2. This increase the minimum supported Rust version from Rust 1.37 to Rust 1.56.
+
 ## [0.1.2] - 2022-02-05
 
 - Support `UnwindSafe` and `RefUnwindSafe` in no-std at Rust 1.56+. ([#3](https://github.com/taiki-e/negative-impl/pull/3))
