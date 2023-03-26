@@ -51,7 +51,7 @@ jobs:
       fail-fast: false
       matrix:
         rust:
-          - '1.37'
+          - '1.56'
           - stable
           - beta
           - nightly
@@ -70,7 +70,6 @@ jobs:
       - run: cargo test --all --all-features
         if: startsWith(matrix.rust, 'nightly')
       - run: cargo minimal-versions build --workspace --all-features --ignore-private
-        if: matrix.rust != '1.37'
 
   # ALL THE PREVIOUS JOBS NEEDS TO BE ADDED TO THE `needs` SECTION OF THIS JOB!
 
