@@ -108,7 +108,8 @@ use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
 use syn::{
-    parse_quote, token, Error, Generics, ItemImpl, Lifetime, LifetimeDef, Path, Result, Token, Type,
+    parse_quote, token, Error, Generics, ItemImpl, Lifetime, LifetimeParam, Path, Result, Token,
+    Type,
 };
 
 #[proc_macro_attribute]
@@ -228,7 +229,7 @@ impl TraitInfo {
 fn insert_lifetime(generics: &mut Generics, lifetime: Lifetime) {
     generics.lt_token.get_or_insert_with(token::Lt::default);
     generics.gt_token.get_or_insert_with(token::Gt::default);
-    generics.params.insert(0, LifetimeDef::new(lifetime).into());
+    generics.params.insert(0, LifetimeParam::new(lifetime).into());
 }
 
 /// Checks if `tokens` is an empty `TokenStream`.
