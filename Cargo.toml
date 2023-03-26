@@ -16,6 +16,7 @@ Negative trait implementations on stable Rust.
 targets = ["x86_64-unknown-linux-gnu"]
 
 [workspace]
+resolver = "2"
 
 [lib]
 proc-macro = true
