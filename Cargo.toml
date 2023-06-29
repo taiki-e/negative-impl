@@ -22,9 +22,9 @@ resolver = "2"
 proc-macro = true
 
 [dependencies]
-syn = { version = "2", features = ["full"] }
-proc-macro2 = "1"
+proc-macro2 = "1.0.60"
 quote = "1"
+syn = { version = "2", features = ["full"] }
 
 [dev-dependencies]
 static_assertions = "1"
