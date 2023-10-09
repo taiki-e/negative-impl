@@ -97,10 +97,6 @@ impl Trait for Type {}
 #![forbid(unsafe_code)]
 #![warn(rust_2018_idioms, single_use_lifetimes, unreachable_pub, clippy::pedantic)]
 
-// older compilers require explicit `extern crate`.
-#[allow(unused_extern_crates)]
-extern crate proc_macro;
-
 #[macro_use]
 mod error;
 
