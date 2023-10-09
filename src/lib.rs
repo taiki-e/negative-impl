@@ -122,8 +122,8 @@ pub fn negative_impl(args: TokenStream, input: TokenStream) -> TokenStream {
 fn parse(args: &TokenStream2, mut impl_: ItemImpl) -> Result<TokenStream2> {
     parse_as_empty(args)?;
 
-    let (trait_path, for_token) = match impl_.trait_.take() {
-        Some((Some(_), path, for_token)) => (path, for_token),
+    let (not_token, trait_path, for_token) = match impl_.trait_.take() {
+        Some((Some(not_token), path, for_token)) => (not_token, path, for_token),
         Some((_, path, _)) => bail!(path, "may only be used on negative trait impls"),
         None => bail!(impl_, "may only be used on negative trait impls"),
     };
@@ -131,7 +131,10 @@ fn parse(args: &TokenStream2, mut impl_: ItemImpl) -> Result<TokenStream2> {
     impl_.attrs.push(parse_quote!(#[doc(hidden)]));
 
     if impl_.unsafety.is_some() {
-        bail!(trait_path, "negative impls cannot be unsafe");
+        bail!(quote!(#not_token #trait_path), "negative impls cannot be unsafe");
+    }
+    if let Some(item) = impl_.items.first() {
+        bail!(item, "negative impls cannot have any items");
     }
 
     let trait_ = TraitInfo::new(&trait_path)?;
