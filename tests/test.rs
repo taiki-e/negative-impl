@@ -5,10 +5,10 @@ use std::panic::{RefUnwindSafe, UnwindSafe};
 use negative_impl::negative_impl;
 use static_assertions::assert_not_impl_all as assert_not_impl;
 
-pub mod basic {
+mod basic {
     use super::*;
 
-    pub struct Foo<T>(T);
+    struct Foo<T>(T);
 
     #[negative_impl]
     impl<T> !Send for Foo<T> {}
