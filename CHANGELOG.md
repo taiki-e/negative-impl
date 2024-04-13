@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Diagnostic improvements.
+
 ## [0.1.4] - 2023-06-29
 
 - Fix build error from dependency when built with `-Z minimal-versions`.
