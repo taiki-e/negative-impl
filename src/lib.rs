@@ -15,8 +15,6 @@ Add this to your `Cargo.toml`:
 negative-impl = "0.1"
 ```
 
-*Compiler support: requires rustc 1.56+*
-
 ## Examples
 
 ```rust
