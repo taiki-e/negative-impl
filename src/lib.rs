@@ -107,12 +107,12 @@ use syn::{
 
 #[proc_macro_attribute]
 pub fn negative_impl(args: TokenStream, input: TokenStream) -> TokenStream {
-    parse(&args.into(), syn::parse_macro_input!(input))
+    attribute(&args.into(), syn::parse_macro_input!(input))
         .unwrap_or_else(Error::into_compile_error)
         .into()
 }
 
-fn parse(args: &TokenStream2, mut impl_: ItemImpl) -> Result<TokenStream2> {
+fn attribute(args: &TokenStream2, mut impl_: ItemImpl) -> Result<TokenStream2> {
     parse_as_empty(args)?;
 
     let (not_token, trait_path, for_token) = match impl_.trait_.take() {
@@ -130,14 +130,8 @@ fn parse(args: &TokenStream2, mut impl_: ItemImpl) -> Result<TokenStream2> {
         bail!(item, "negative impls cannot have any items");
     }
 
-    let trait_ = TraitInfo::new(&trait_path)?;
-    impl_.trait_ = Some((None, trait_.full_path.clone(), for_token));
-
-    Ok(expand(trait_, impl_))
-}
-
-fn expand(trait_: TraitInfo, mut impl_: ItemImpl) -> TokenStream2 {
-    let TraitInfo { trivial_bounds, unsafety, maybe_unsized, full_path } = trait_;
+    let TraitInfo { trivial_bounds, unsafety, maybe_unsized, full_path } =
+        TraitInfo::new(&trait_path)?;
 
     let wrapper_lifetime = Lifetime::new("'__wrapper", Span::call_site());
     let wrapper_ident = format_ident!("__Wrapper");
@@ -150,20 +144,24 @@ fn expand(trait_: TraitInfo, mut impl_: ItemImpl) -> TokenStream2 {
     insert_lifetime(&mut impl_.generics, wrapper_lifetime);
 
     let unsafety = if unsafety { Some(<Token![unsafe]>::default()) } else { None };
-    impl_.unsafety = unsafety;
 
     let sized = if maybe_unsized { Some(quote!(: ?Sized)) } else { None };
+    let wrapper = quote! {
+        pub struct #wrapper_ident<'a, T #sized>(::core::marker::PhantomData<&'a ()>, T);
+        #unsafety impl<T #sized> #full_path for #wrapper_ident<'_, T>
+            where T: #full_path {}
+    };
 
-    quote! {
+    impl_.trait_ = Some((None, full_path, for_token));
+    impl_.unsafety = unsafety;
+    Ok(quote! {
         const _: () = {
-            pub struct #wrapper_ident<'a, T #sized>(::core::marker::PhantomData<&'a ()>, T);
-            #unsafety impl<T #sized> #full_path for #wrapper_ident<'_, T>
-                where T: #full_path {}
+            #wrapper
             // This is false positive as we generate a trait implementation with a condition that will never be true.
             #[allow(clippy::non_send_fields_in_send_ty)]
             #impl_
         };
-    }
+    })
 }
 
 struct TraitInfo {
