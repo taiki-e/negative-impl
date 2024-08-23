@@ -10,6 +10,8 @@ Note: In this file, do not use the hard wrap in the middle of a sentence for com
 
 ## [Unreleased]
 
+- Disable `derive` and `clone-impls` features of `syn` dependency.
+
 ## [0.1.5] - 2024-04-13
 
 - Diagnostic improvements.
