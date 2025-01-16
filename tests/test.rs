@@ -32,3 +32,17 @@ mod basic {
     impl<T> !RefUnwindSafe for Foo<T> {}
     assert_not_impl!(Foo<()>: RefUnwindSafe);
 }
+
+mod conflicting_implementations {
+    use super::*;
+
+    struct Type {}
+
+    #[negative_impl]
+    impl !Send for Type {}
+
+    trait Trait {}
+
+    impl<T: Send> Trait for T {}
+    impl Trait for Type {}
+}
