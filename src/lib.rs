@@ -37,51 +37,6 @@ Currently this crate only supports [auto traits](https://doc.rust-lang.org/refer
 - [`Unpin`](https://doc.rust-lang.org/std/marker/trait.Unpin.html)
 - [`UnwindSafe`](https://doc.rust-lang.org/std/panic/trait.UnwindSafe.html)
 - [`RefUnwindSafe`](https://doc.rust-lang.org/std/panic/trait.RefUnwindSafe.html)
-
-## Limitations
-
-### Conflicting implementations
-
-The following code cannot compile due to `impl<T: Send> Trait for T` and
-`impl Trait for Type` conflict.
-
-```rust,compile_fail,E0119
-use negative_impl::negative_impl;
-
-pub struct Type {}
-
-#[negative_impl]
-impl !Send for Type {}
-
-trait Trait {}
-
-impl<T: Send> Trait for T {}
-impl Trait for Type {}
-```
-
-```text
-error[E0119]: conflicting implementations of trait `Trait` for type `Type`:
-  --> src/lib.rs:60:1
-   |
-14 | impl<T: Send> Trait for T {}
-   | ------------------------- first implementation here
-15 | impl Trait for Type {}
-   | ^^^^^^^^^^^^^^^^^^^ conflicting implementation for `Type`
-```
-
-The above code can be compiled using the unstable `negative_impls` feature.
-
-```rust
-#![feature(negative_impls)]
-
-pub struct Type {}
-
-impl !Send for Type {}
-
-trait Trait {}
-
-impl<T: Send> Trait for T {}
-impl Trait for Type {}
 ```
 */
 
@@ -99,11 +54,8 @@ mod error;
 
 use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
-use quote::{format_ident, quote};
-use syn::{
-    parse_quote, token, Error, Generics, ItemImpl, Lifetime, LifetimeParam, Path, Result, Token,
-    Type,
-};
+use quote::quote;
+use syn::{parse_quote, Error, ItemImpl, Lifetime, Path, Result, Token};
 
 #[proc_macro_attribute]
 pub fn negative_impl(args: TokenStream, input: TokenStream) -> TokenStream {
@@ -130,33 +82,21 @@ fn attribute(args: &TokenStream2, mut impl_: ItemImpl) -> Result<TokenStream2> {
         bail!(item, "negative impls cannot have any items");
     }
 
-    let TraitInfo { trivial_bounds, unsafety, maybe_unsized, full_path } =
-        TraitInfo::new(&trait_path)?;
+    let TraitInfo { unsafety, full_path } = TraitInfo::new(&trait_path)?;
 
-    let wrapper_lifetime = Lifetime::new("'__wrapper", Span::call_site());
-    let wrapper_ident = format_ident!("__Wrapper");
+    let dummy_lifetime = Lifetime::new("'__dummy", Span::call_site());
 
     let trivial_bounds = parse_quote!(
-        #wrapper_ident<#wrapper_lifetime, #trivial_bounds>: #full_path
+        for<#dummy_lifetime> [()]: ::core::marker::Sized
     );
     impl_.generics.make_where_clause().predicates.push(trivial_bounds);
 
-    insert_lifetime(&mut impl_.generics, wrapper_lifetime);
-
     let unsafety = if unsafety { Some(<Token![unsafe]>::default()) } else { None };
-
-    let sized = if maybe_unsized { Some(quote!(: ?Sized)) } else { None };
-    let wrapper = quote! {
-        pub struct #wrapper_ident<'a, T #sized>(::core::marker::PhantomData<&'a ()>, T);
-        #unsafety impl<T #sized> #full_path for #wrapper_ident<'_, T>
-            where T: #full_path {}
-    };
 
     impl_.trait_ = Some((None, full_path, for_token));
     impl_.unsafety = unsafety;
     Ok(quote! {
         const _: () = {
-            #wrapper
             // This is false positive as we generate a trait implementation with a condition that will never be true.
             #[allow(clippy::non_send_fields_in_send_ty)]
             #impl_
@@ -165,65 +105,25 @@ fn attribute(args: &TokenStream2, mut impl_: ItemImpl) -> Result<TokenStream2> {
 }
 
 struct TraitInfo {
-    trivial_bounds: Type,
     unsafety: bool,
-    maybe_unsized: bool,
     full_path: Path,
 }
 
 impl TraitInfo {
     fn new(path: &Path) -> Result<Self> {
         match &*path.segments.last().unwrap().ident.to_string() {
-            "Send" => Ok(Self {
-                // https://github.com/rust-lang/rust/blob/1.37.0/src/libcore/marker.rs#L41
-                // https://github.com/rust-lang/rust/blob/1.84.0/library/core/src/marker.rs#L88
-                trivial_bounds: parse_quote!(*const ()),
-                unsafety: true,
-                maybe_unsized: true,
-                full_path: parse_quote!(::core::marker::Send),
-            }),
-            "Sync" => Ok(Self {
-                // https://github.com/rust-lang/rust/blob/1.37.0/src/libcore/marker.rs#L380
-                // https://github.com/rust-lang/rust/blob/1.84.0/library/core/src/marker.rs#L613
-                trivial_bounds: parse_quote!(*const ()),
-                unsafety: true,
-                maybe_unsized: true,
-                full_path: parse_quote!(::core::marker::Sync),
-            }),
-            "Unpin" => Ok(Self {
-                // https://github.com/rust-lang/rust/blob/1.37.0/src/libcore/marker.rs#L650
-                // https://github.com/rust-lang/rust/blob/1.84.0/library/core/src/marker.rs#L936
-                trivial_bounds: parse_quote!(::core::marker::PhantomPinned),
-                unsafety: false,
-                maybe_unsized: true,
-                full_path: parse_quote!(::core::marker::Unpin),
-            }),
-            "UnwindSafe" => Ok(Self {
-                // https://github.com/rust-lang/rust/blob/1.37.0/src/libstd/panic.rs#L203
-                // https://github.com/rust-lang/rust/blob/1.84.0/library/core/src/panic/unwind_safe.rs#L181
-                trivial_bounds: parse_quote!(&'static mut ()),
-                unsafety: false,
-                maybe_unsized: true,
-                full_path: parse_quote!(::core::panic::UnwindSafe),
-            }),
-            "RefUnwindSafe" => Ok(Self {
-                // https://github.com/rust-lang/rust/blob/1.37.0/src/libstd/panic.rs#L234
-                // https://github.com/rust-lang/rust/blob/1.84.0/library/core/src/panic/unwind_safe.rs#L200
-                trivial_bounds: parse_quote!(::core::cell::UnsafeCell<()>),
-                unsafety: false,
-                maybe_unsized: true,
-                full_path: parse_quote!(::core::panic::RefUnwindSafe),
-            }),
+            "Send" => Ok(Self { unsafety: true, full_path: parse_quote!(::core::marker::Send) }),
+            "Sync" => Ok(Self { unsafety: true, full_path: parse_quote!(::core::marker::Sync) }),
+            "Unpin" => Ok(Self { unsafety: false, full_path: parse_quote!(::core::marker::Unpin) }),
+            "UnwindSafe" => {
+                Ok(Self { unsafety: false, full_path: parse_quote!(::core::panic::UnwindSafe) })
+            }
+            "RefUnwindSafe" => {
+                Ok(Self { unsafety: false, full_path: parse_quote!(::core::panic::RefUnwindSafe) })
+            }
             _ => bail!(path, "non auto traits are not supported"),
         }
     }
-}
-
-/// Inserts a `lifetime` at position `0` of `generics.params`.
-fn insert_lifetime(generics: &mut Generics, lifetime: Lifetime) {
-    generics.lt_token.get_or_insert_with(token::Lt::default);
-    generics.gt_token.get_or_insert_with(token::Gt::default);
-    generics.params.insert(0, LifetimeParam::new(lifetime).into());
 }
 
 /// Checks if `tokens` is an empty `TokenStream`.
