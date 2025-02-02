@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
 /*!
+<!-- Note: Document from sync-markdown-to-rustdoc:start through sync-markdown-to-rustdoc:end
+     is synchronized from README.md. Any changes to that range are not preserved. -->
+<!-- tidy:sync-markdown-to-rustdoc:start -->
+
 Negative trait implementations on stable Rust.
 
 This crate emulates the [unstable `negative_impls` feature](https://doc.rust-lang.org/nightly/unstable-book/language-features/negative-impls.html)
@@ -17,7 +21,7 @@ negative-impl = "0.1"
 
 ## Examples
 
-```rust
+```
 use negative_impl::negative_impl;
 
 pub struct Type {}
@@ -45,7 +49,7 @@ Currently this crate only supports [auto traits](https://doc.rust-lang.org/refer
 The following code cannot compile due to `impl<T: Send> Trait for T` and
 `impl Trait for Type` conflict.
 
-```rust,compile_fail,E0119
+```compile_fail,E0119
 use negative_impl::negative_impl;
 
 pub struct Type {}
@@ -71,7 +75,7 @@ error[E0119]: conflicting implementations of trait `Trait` for type `Type`:
 
 The above code can be compiled using the unstable `negative_impls` feature.
 
-```rust
+```
 #![feature(negative_impls)]
 
 pub struct Type {}
@@ -83,6 +87,8 @@ trait Trait {}
 impl<T: Send> Trait for T {}
 impl Trait for Type {}
 ```
+
+<!-- tidy:sync-markdown-to-rustdoc:end -->
 */
 
 #![doc(test(

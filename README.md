@@ -6,6 +6,8 @@
 [![msrv](https://img.shields.io/badge/msrv-1.56-blue?style=flat-square&logo=rust)](https://www.rust-lang.org)
 [![github actions](https://img.shields.io/github/actions/workflow/status/taiki-e/negative-impl/ci.yml?branch=main&style=flat-square&logo=github)](https://github.com/taiki-e/negative-impl/actions)
 
+<!-- tidy:sync-markdown-to-rustdoc:start:src/lib.rs -->
+
 Negative trait implementations on stable Rust.
 
 This crate emulates the [unstable `negative_impls` feature](https://doc.rust-lang.org/nightly/unstable-book/language-features/negative-impls.html)
@@ -50,6 +52,7 @@ Currently this crate only supports [auto traits](https://doc.rust-lang.org/refer
 The following code cannot compile due to `impl<T: Send> Trait for T` and
 `impl Trait for Type` conflict.
 
+<!-- tidy:sync-markdown-to-rustdoc:code-block:compile_fail,E0119 -->
 ```rust
 use negative_impl::negative_impl;
 
@@ -88,6 +91,8 @@ trait Trait {}
 impl<T: Send> Trait for T {}
 impl Trait for Type {}
 ```
+
+<!-- tidy:sync-markdown-to-rustdoc:end -->
 
 ## License
 
