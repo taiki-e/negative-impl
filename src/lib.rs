@@ -107,8 +107,8 @@ use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
 use syn::{
-    parse_quote, token, Error, Generics, ItemImpl, Lifetime, LifetimeParam, Path, Result, Token,
-    Type,
+    Error, Generics, ItemImpl, Lifetime, LifetimeParam, Path, Result, Token, Type, parse_quote,
+    token,
 };
 
 #[proc_macro_attribute]
@@ -237,9 +237,5 @@ fn insert_lifetime(generics: &mut Generics, lifetime: Lifetime) {
 /// This is almost equivalent to `syn::parse2::<Nothing>()`, but produces
 /// a better error message and does not require ownership of `tokens`.
 fn parse_as_empty(tokens: &TokenStream2) -> Result<()> {
-    if tokens.is_empty() {
-        Ok(())
-    } else {
-        bail!(tokens, "unexpected token: `{}`", tokens)
-    }
+    if tokens.is_empty() { Ok(()) } else { bail!(tokens, "unexpected token: `{}`", tokens) }
 }
