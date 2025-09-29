@@ -3,7 +3,7 @@
 [![crates.io](https://img.shields.io/crates/v/negative-impl?style=flat-square&logo=rust)](https://crates.io/crates/negative-impl)
 [![docs.rs](https://img.shields.io/badge/docs.rs-negative--impl-blue?style=flat-square&logo=docs.rs)](https://docs.rs/negative-impl)
 [![license](https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue?style=flat-square)](#license)
-[![msrv](https://img.shields.io/badge/msrv-1.56-blue?style=flat-square&logo=rust)](https://www.rust-lang.org)
+[![msrv](https://img.shields.io/badge/msrv-1.61-blue?style=flat-square&logo=rust)](https://www.rust-lang.org)
 [![github actions](https://img.shields.io/github/actions/workflow/status/taiki-e/negative-impl/ci.yml?branch=main&style=flat-square&logo=github)](https://github.com/taiki-e/negative-impl/actions)
 
 <!-- tidy:sync-markdown-to-rustdoc:start:src/lib.rs -->
