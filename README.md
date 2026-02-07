@@ -27,7 +27,7 @@ negative-impl = "0.1"
 ```rust
 use negative_impl::negative_impl;
 
-pub struct Type {}
+struct Type {}
 
 #[negative_impl]
 impl !Send for Type {}
@@ -56,7 +56,7 @@ The following code cannot compile due to `impl<T: Send> Trait for T` and
 ```rust
 use negative_impl::negative_impl;
 
-pub struct Type {}
+struct Type {}
 
 #[negative_impl]
 impl !Send for Type {}
@@ -82,7 +82,7 @@ The above code can be compiled using the unstable `negative_impls` feature.
 ```rust
 #![feature(negative_impls)]
 
-pub struct Type {}
+struct Type {}
 
 impl !Send for Type {}
 

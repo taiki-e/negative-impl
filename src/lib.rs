@@ -24,7 +24,7 @@ negative-impl = "0.1"
 ```
 use negative_impl::negative_impl;
 
-pub struct Type {}
+struct Type {}
 
 #[negative_impl]
 impl !Send for Type {}
@@ -52,7 +52,7 @@ The following code cannot compile due to `impl<T: Send> Trait for T` and
 ```compile_fail,E0119
 use negative_impl::negative_impl;
 
-pub struct Type {}
+struct Type {}
 
 #[negative_impl]
 impl !Send for Type {}
@@ -78,7 +78,7 @@ The above code can be compiled using the unstable `negative_impls` feature.
 ```
 #![feature(negative_impls)]
 
-pub struct Type {}
+struct Type {}
 
 impl !Send for Type {}
 
@@ -93,10 +93,12 @@ impl Trait for Type {}
 
 #![doc(test(
     no_crate_inject,
-    attr(
-        deny(warnings, rust_2018_idioms, single_use_lifetimes),
-        allow(dead_code, unused_variables)
-    )
+    attr(allow(
+        dead_code,
+        unused_variables,
+        clippy::undocumented_unsafe_blocks,
+        clippy::unused_trait_names,
+    ))
 ))]
 #![forbid(unsafe_code)]
 
