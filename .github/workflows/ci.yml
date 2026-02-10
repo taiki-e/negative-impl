@@ -40,7 +40,7 @@ jobs:
     uses: taiki-e/github-actions/.github/workflows/test.yml@main
     with:
       rust: 1.71,stable,beta,nightly
-      doc-nightly-only: true
+      doctest-nightly-only: true
   tidy:
     uses: taiki-e/github-actions/.github/workflows/tidy.yml@main
     permissions:
