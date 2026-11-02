@@ -109,8 +109,8 @@ use proc_macro::TokenStream;
 use proc_macro2::{Span, TokenStream as TokenStream2};
 use quote::{format_ident, quote};
 use syn::{
-    Error, Generics, ItemImpl, Lifetime, LifetimeParam, Path, Result, Token, Type, parse_quote,
-    token,
+    Error, GenericParam, Generics, ItemImpl, Lifetime, LifetimeParam, Path, Result, Token, Type,
+    parse_quote, token,
 };
 
 #[proc_macro_attribute]
@@ -123,10 +123,11 @@ pub fn negative_impl(args: TokenStream, input: TokenStream) -> TokenStream {
 fn attribute(args: &TokenStream2, mut impl_: ItemImpl) -> Result<TokenStream2> {
     parse_as_empty(args)?;
 
-    let (not_token, trait_path, for_token) = match impl_.trait_.take() {
-        Some((Some(not_token), path, for_token)) => (not_token, path, for_token),
-        Some((_, path, _)) => bail!(path, "may only be used on negative trait impls"),
-        None => bail!(impl_, "may only be used on negative trait impls"),
+    let Some((trait_path, for_token)) = impl_.trait_.take() else {
+        bail!(impl_, "may only be used on negative trait impls");
+    };
+    let Some(not_token) = impl_.modifiers.polarity.take() else {
+        bail!(trait_path, "may only be used on negative trait impls");
     };
     // https://github.com/rust-lang/rust/issues/80481
     impl_.attrs.push(parse_quote!(#[doc(hidden)]));
@@ -160,7 +161,7 @@ fn attribute(args: &TokenStream2, mut impl_: ItemImpl) -> Result<TokenStream2> {
             where T: #full_path {}
     };
 
-    impl_.trait_ = Some((None, full_path, for_token));
+    impl_.trait_ = Some((full_path, for_token));
     impl_.unsafety = unsafety;
     Ok(quote! {
         const _: () = {
@@ -231,7 +232,7 @@ impl TraitInfo {
 fn insert_lifetime(generics: &mut Generics, lifetime: Lifetime) {
     generics.lt_token.get_or_insert_with(token::Lt::default);
     generics.gt_token.get_or_insert_with(token::Gt::default);
-    generics.params.insert(0, LifetimeParam::new(lifetime).into());
+    generics.params.insert(0, GenericParam::Lifetime(LifetimeParam::new(lifetime)));
 }
 
 /// Checks if `tokens` is an empty `TokenStream`.
